@@ -212,8 +212,7 @@ for (k in 1:number3) {
   averagecell <- data.frame(aggregate(as.numeric(content[,"LATITUDE"]),by= list(content$LATITUDE, content$LONGITUDE),mean, na.rm=TRUE)[-c(1,2)],  ###Latitude
                             aggregate(as.numeric(content[,"LONGITUDE"]),by= list(content$LATITUDE, content$LONGITUDE),mean, na.rm=TRUE)[-c(1,2)],  ### Longitude
                             aggregate(as.numeric(content[,"HARVEST_AREA"]),by= list(content$LATITUDE, content$LONGITUDE),mean,na.rm=TRUE)[-c(1,2)],   ##Harvest Area each cell 
-                
-                            aggregate(as.numeric(gsub("^.{4}", "", content[,"SDAT"])),by= list(content$LATITUDE, content$LONGITUDE),mean,na.rm=TRUE)[-c(1,2)],  ###SDAT 
+              
                              
                             aggregate(as.numeric(gsub("^.{4}", "", content[,"PDAT"])),by= list(content$LATITUDE, content$LONGITUDE), mean,na.rm=TRUE)[-c(1,2)], #### PDAT 
                             aggregate(as.numeric(gsub("^.{4}", "", content[,"HDAT"])),by= list(content$LATITUDE, content$LONGITUDE), mean,na.rm=TRUE)[-c(1,2)], #### HDAT 
@@ -233,7 +232,7 @@ for (k in 1:number3) {
   
   
   
-  names(averagecell) <- c("LATITUDE", "LONGITUDE", "HARVEST_AREA", "SDAT", "PDAT", 
+  names(averagecell) <- c("LATITUDE", "LONGITUDE", "HARVEST_AREA", "PDAT", 
                           "HDAT", "HWAM", "TMAXA", "TMINA", "PRCP", "MDAT", "CWAM", "HWAH", "GNAM", "CNAM", "NICM","EDAT","ADAT")
  print(nrow(averagecell))
   ###for meher season 
