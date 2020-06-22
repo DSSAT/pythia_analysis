@@ -24,6 +24,17 @@
 ###    °--Maize_rf_lowN_belg_S_season_fen_tot_50     
 
 
+#### this script help us to create csv files for each management and 
+#####       a weighted average for all managements 
+### Example output files 
+##### Maize_irrig_belg_S_season_fen_tot_50.csv for irrigated management       
+####  Maize_rf-0N_belg_S_season_fen_tot_50.csv    for rainfed low input management
+####  Maize_rf-highN_belg_S_season_fen_tot_50.csv    for rainfed high input management
+####  Maize_rf-lowN_belg_S_season_fen_tot_50.csv   for rainfed low input management
+####  Maize_belg_S_season_fen_tot_50.csv for weighted average between all managements
+
+
+
 rm(list=ls())
 #rm(list=setdiff(ls(), c("Workdir", "Outdir"))) #remove everthing except workdir and outdir
 library(plotly)
@@ -42,14 +53,20 @@ library(tidyverse)
 
 Workdir <-"D:\\Workdata\\Ethiopia\\Sensitivity_Runs_NewPdatzones\\ETH_ALL_MZ\\ETH_MZ_fen_tot\\ETH_MZ_Meher_fen_tot"
 setwd(Workdir)
-#Outdir1 <- dir.create(file.path(dirname(Workdir), "GHA_MZ_Main_Base_Analysis4"), suppressWarnings(dirname))
-#Outdir <- file.path(dirname(Workdir), "GHA_MZ_Main_Base_Analysis4")
+
+## creating new output folder automatically in the one upper level of working directory 
+outputfname <- "ETH_fen_tot_test_Kelem3"
+Outdir1 <- dir.create(file.path(dirname(dirname(Workdir)), outputfname), suppressWarnings(dirname))
+Outdir <- file.path(dirname(dirname(Workdir)), outputfname)
+
+## or you can create specific output folder below
 Outdir <- "D:\\Workdata\\Ethiopia\\Sensitivity_Runs_NewPdatzones\\ETH_ALL_MZ\\Test2"
 ####getting aggregated average for each sell
 
 
 ###ISO3 country name 
 cntry <- as.character("Ethiopia")
+
 ## inputs ### 
 nyears <- 34 #####number of years in seasonal analysis
 
@@ -87,8 +104,8 @@ parentfolder <- dir()
 numpar <- length(parentfolder)
 resultssens <- c()
 for (j in 1:numpar){
-#Locations each cells
-kc <- paste0(Workdir, "\\", parentfolder[1])
+#Locations each parent folders
+kc <- paste0(Workdir, "\\", parentfolder[j])
 kc
 list.dirs(kc)
 main <- list.dirs(kc)[1]
@@ -113,7 +130,7 @@ resultsw <- c()
 for (k in 1:number3) {
   klm <- c()
   #matrix for reading csv colums
-  cd <-paste0(kc, '\\', mainfolder[1])
+  cd <-paste0(kc, '\\', mainfolder[k])
   cd
   filename <- dir(cd)
   filename
@@ -131,8 +148,8 @@ for (k in 1:number3) {
   ##grabbing years from SDAT
   years <- seq(frstyear, frstyear+max(content[,"RUNNO"])-1,1)
 
-  if(!length(grep(paste(range,collapse="|"), gsub(".{3}$", "", content[,"SDAT"])))==0){
-    rowsofyears <- grep(paste(range,collapse="|"), gsub(".{3}$", "", content[,"SDAT"]))
+  if(!length(grep(paste(range,collapse="|"), gsub(".{3}$", "", content[,"HDAT"])))==0){
+    rowsofyears <- grep(paste(range,collapse="|"), gsub(".{3}$", "", content[,"HDAT"]))
     content <- content[][rowsofyears,]
   }else{
     
@@ -140,6 +157,7 @@ for (k in 1:number3) {
  
   
   ### spatial querry #####
+  ### this part helps us to clip area of interest
   content <- st_as_sf(content, coords =c("LONGITUDE", "LATITUDE"), crs = 4326)
   content <- st_intersection(content, st_set_crs(st_as_sf(as(poly3, "SpatialPolygons")), st_crs(content)))
 
@@ -154,59 +172,20 @@ for (k in 1:number3) {
   
   
   content <- st_set_geometry(content,NULL)
-  #filter(your_df, grepl(paste(patterns, collapse="|"), Letter))
-###colnames(content) <- c(colnames(content)[-1],NULL)
-#####remove last column if NA
-###content <- content[1:(ncol(content)-1)]
+
 #####excluding rows with unwanted years for analysis ####
-    if(!length(grep("2019", gsub(".{3}$", "", content[,"SDAT"])))==0){
-      rowsof2019 <- grep("2019", gsub(".{3}$", "", content[,"SDAT"]))
-      content <- content[-rowsof2019,]
-    }else{
-        
-    }
-    
- # if(!length(grep("2018", gsub(".{3}$", "", content[,"SDAT"])))==0){
- #   rowsof2018 <- grep("2018", gsub(".{3}$", "", content[,"SDAT"]))
- #   content <- content[-rowsof2018,]
- # }else{
- #   
- # }
- #
- # if(!length(grep("2017", gsub(".{3}$", "", content[,"SDAT"])))==0){
- #   rowsof2017 <- grep("2017", gsub(".{3}$", "", content[,"SDAT"]))
- #   content <- content[-rowsof2017,]
- # }else{
- #   
- # }
- # ### removing rows that over next year for HDAT ###
- # if(!length(grep("2018", gsub(".{3}$", "", content[,"HDAT"])))==0){
- #   rowsof2018 <- grep("2018", gsub(".{3}$", "", content[,"HDAT"]))
- #   content <- content[-rowsof2018,]
- # }else{
- #   
- # }
-  
- ## ### removing rows that has -99 values in HWAM ###
- ##  if(!length(grep("-99", content[,"HWAM"]))==0){
- ##    rowsof99 <- grep("-99", content[,"HWAM"])
- ##    #content <- content[][rowsof99,]
- ##    content <- content[-rowsof99,]
- ##  }else{
- ##    
- ##  }
+#### examples for excluding year of 2019 
+  ##if(!length(grep("2019", gsub(".{3}$", "", content[,"SDAT"])))==0){
+##  rowsof2019 <- grep("2019", gsub(".{3}$", "", content[,"SDAT"]))
+##  content <- content[-rowsof2019,]
+##}else{
+##    
+##}
   
   
   ## change all -99 to NA 
   content[,"HWAM"][content[,"HWAM"]== -99] <- NA
   
-### change only HWAM -99 values to NA 
- ##   if(!length(grep("-99", content[,"HWAM"]))==0){
- ##   rowsof99 <- grep("-99", content[,"HWAM"])
- ##   content[rowsof99, "HWAM"] <- NA
- ## }else{
- ##   
- ## }
     
 ## grep application, crop, managements name here 
   
@@ -268,7 +247,7 @@ for (k in 1:number3) {
    }}else{
      
    }
-   
+   ### getting the results for each management
   resultfiles <- paste0(Outdir, "\\", content[1,"RUN_NAME"], ".csv")
   write.csv(averagecell,resultfiles)
   result <- rbind(result, averagecell)
@@ -330,17 +309,12 @@ deneme3$HDAT <- as.integer(deneme3$HDAT)
 deneme3$MDAT <- as.integer(deneme3$MDAT)
 deneme3$EDAT <- as.integer(deneme3$EDAT)
 deneme3$ADAT <- as.integer(deneme3$ADAT)
-deneme3["TOTAL_P"] <- (deneme3$HARVEST_AREA * deneme3$HWAM)/1000
-deneme3["NICM_T"] <- (deneme3$HARVEST_AREA * deneme3$NICM)
+deneme3["TOT_PROD"] <- (deneme3$HARVEST_AREA * deneme3$HWAM)/1000
+deneme3["TOT_NICM"] <- (deneme3$HARVEST_AREA * deneme3$NICM)
 deneme3["VWAM"] <- deneme3$CWAM-deneme3$HWAM   ### 
 deneme3["VNAM"] <- deneme3$CNAM-deneme3$GNAM
 print(nrow(deneme3))
-# Showing Cumulative TOTAL PRODUCTION by harvesting date #####
-###Cumsum_TOTAL_P <- aggregate(deneme3$TOTAL_P, by = list(deneme3$HDAT), FUN=cumsum) 
-###
-####Cumsum_TOTAL_P["sumrows"] <- data.frame(unlist(lapply(Cumsum_TOTAL_P$x, function(x) sum(x))))
-###Cumsum_TOTAL_P["sumrows"] <- unlist(lapply(Cumsum_TOTAL_P$x, function(x) tail(unlist(x),n=1)))
-###Cumsum_TOTAL_P["Cumsum_TOTAL_P"] <- cumsum(Cumsum_TOTAL_P$sumrows)
+
 
 assign(gsub(" ","", paste("name", j)), deneme3)
 ##if(!length(name1)==0){
@@ -355,7 +329,7 @@ resultssens <- rbind(resultssens, deneme3)
 
 
 
-###Giving parent folder name to csv files #####
+###Giving mainfolder names to csv files #####
 resultsfiles2 <- paste0(Outdir, "\\", paste(unlist(strsplit(as.character(content[1,"RUN_NAME"]),"_", fixed=TRUE))[-2], collapse = "_"), ".csv")
 write.csv(deneme3, resultsfiles2)
 
