@@ -52,33 +52,33 @@ library(GADMTools)
 
 
 ### set working directory here
-Workdir <-"D:\\Workdata\\Ghana\\Maize_base_run_6_8_abo\\Maize_base_run_abo_fentot150\\GHA_MZ_Main_base"
+Workdir <-"D:\\Workdata\\Ethiopia\\Sensitivity_Runs_NewPdatzones\\ETH_ALL_MZ\\ETH_MZ_base\\ETH_MZ_Belg_base"
 setwd(Workdir)
 ### give output folder name here
-outputfname <- "GHA_MZ_Main_Base_Analysis_Abo_adminlvl2test"
+outputfname <- "ETH_MZ_Belg_Base_Analysis_adminlvl1test"
 Outdir1 <- dir.create(file.path(dirname(Workdir), outputfname), suppressWarnings(dirname))
 Outdir <- file.path(dirname(Workdir), outputfname)
 
 
 
-###Choosing mainfolder Management types only rainfed or only irrigated
-#### 1: irrigated 2: rainfed 0N  3: rainfed highN  4: rainfed lowN c(1,2,3,4)
 
-### Change it on line 108
+
+### Change it on line 
 ###Choosing mainfolder Management types only rainfed or only irrigated
 #### 1: irrigated 2: rainfed 0N  3: rainfed highN  4: rainfed lowN c(1,2,3,4)
 ###mainfolder <- mainfolder[][c(1,2,3,4)]
+
 ### choosing admin level for subsetting data (based on the GADM database)
 
 adminlvl <- 1
 ###ISO3 country name 
-cntryname <- as.character("GHA")
+cntryname <- as.character("ETH")
 ## inputs ### 
 nyears <- 34 #####number of years in seasonal analysis
 
 
 ## filtering years, choosing year range 
-frstyear <- 2018
+frstyear <- 1985
 lstyear <- 2018
 range <- as.character(seq(frstyear, lstyear,1))
 
@@ -110,7 +110,7 @@ for (j in 1:numpar){
     mainfolder
     ###Choosing mainfolder Management types only rainfed or only irrigated
     #### 1: irrigated 2: rainfed 0N  3: rainfed highN  4: rainfed lowN c(1,2,3,4)
-    mainfolder <- mainfolder[][c(1,2,3)]
+    mainfolder <- mainfolder[][c(1,2,3,4)]
     mainfolder
     mainfoldername <- unlist(strsplit(mainfolder, "_", fixed = TRUE))[1] ###irrig name 
     #mainfolder <- mainfolder [sapply(mainfolder, function(x) length(list.files(x))>0)]
@@ -168,28 +168,29 @@ for (j in 1:numpar){
       newallmng <- allmng[][rowsofsameyears,]
 
 
-      waggregation <- data.frame(as.numeric(gsub(".{3}$", "", newallmng[,"SDAT"])),
-                                as.numeric(newallmng[, "LATITUDE"]),
-                                as.numeric(newallmng[, "LONGITUDE"]),
-                                newallmng[,"HARVEST_AREA"],
+      waggregation <- data.frame(YEARS= as.numeric(gsub(".{3}$", "", newallmng[,"HDAT"])),
+                                LATITUDE= as.numeric(newallmng[, "LATITUDE"]),
+                                LONGITUDE=as.numeric(newallmng[, "LONGITUDE"]),
+                                HARVEST_AREA=newallmng[,"HARVEST_AREA"],
 
-                                as.numeric(gsub("^.{4}", "", newallmng[,"PDAT"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(gsub("^.{4}", "", newallmng[,"HDAT"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(newallmng[,"HWAM"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(newallmng[,"TMAXA"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(newallmng[,"TMINA"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(newallmng[,"PRCP"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(gsub("^.{4}", "", newallmng[,"MDAT"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(newallmng[,"CWAM"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(newallmng[,"HWAH"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(newallmng[,"GNAM"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(newallmng[,"CNAM"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(gsub("^.{4}", "", newallmng[,"EDAT"])) * as.numeric(newallmng[, "HARVEST_AREA"]), 
-                                as.numeric(gsub("^.{4}", "", newallmng[,"ADAT"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(gsub("^.{4}", "", newallmng[,"NICM"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(gsub("^.{4}", "", newallmng[,"NUCM"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
-                                as.numeric(gsub("^.{4}", "", newallmng[,"NMINC"])) * as.numeric(newallmng[, "HARVEST_AREA"])
-        )
+                                PDAT=as.numeric(gsub("^.{4}", "", newallmng[,"PDAT"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                HDAT=as.numeric(gsub("^.{4}", "", newallmng[,"HDAT"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                HWAM=as.numeric(newallmng[,"HWAM"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                TMAX =as.numeric(newallmng[,"TMAXA"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                TMINA=as.numeric(newallmng[,"TMINA"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                PRPC=as.numeric(newallmng[,"PRCP"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                MDAT=as.numeric(gsub("^.{4}", "", newallmng[,"MDAT"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                CWAM=as.numeric(newallmng[,"CWAM"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                HWAH=as.numeric(newallmng[,"HWAH"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                GNAM=as.numeric(newallmng[,"GNAM"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                CNAM=as.numeric(newallmng[,"CNAM"]) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                EDAT=as.numeric(gsub("^.{4}", "", newallmng[,"EDAT"])) * as.numeric(newallmng[, "HARVEST_AREA"]), 
+                                ADAT=as.numeric(gsub("^.{4}", "", newallmng[,"ADAT"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                NICM=as.numeric(gsub("^.{4}", "", newallmng[,"NICM"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                NUCM=as.numeric(gsub("^.{4}", "", newallmng[,"NUCM"])) * as.numeric(newallmng[, "HARVEST_AREA"]),
+                                NMINC=as.numeric(gsub("^.{4}", "", newallmng[,"NMINC"])) * as.numeric(newallmng[, "HARVEST_AREA"])
+        
+                               )
  
  
           names(waggregation) <- c("YEARS", "LATITUDE", "LONGITUDE", "HARVEST_AREA", "PDAT", 
@@ -333,6 +334,7 @@ plot(zone1)
 
 ### applying special queery here 
 gha_pp_sfzones <- st_intersection(gha_pp_sf, st_set_crs(st_as_sf(as(zone1, "SpatialPolygons")), st_crs(gha_pp_sf)))
+if(!nrow(gha_pp_sfzones==0)){
 gha_pp_sfzones <- gha_pp_sfzones %>%
   mutate( LONGITUDE= unlist(map(gha_pp_sfzones$geometry,1)),
           LATITUDE = unlist(map(gha_pp_sfzones$geometry,2)))
@@ -349,7 +351,9 @@ gha_pp_sfzones <- st_set_geometry(gha_pp_sfzones,NULL)
 #years <- as.numeric(years)
 zonecsvname <- paste0(Outdir, "\\", years[e], zonename, parentname, ".csv")
 write.csv(gha_pp_sfzones, file = zonecsvname)
-
+}else{
+  
+}
 
   
 }

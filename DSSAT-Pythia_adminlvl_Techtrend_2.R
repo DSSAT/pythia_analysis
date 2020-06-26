@@ -34,6 +34,8 @@ outputfname <- "GHA_MZ_Main_Base_Analysis_Abo_adminlvl_techtrend2_test"
 Outdir1 <- dir.create(file.path(dirname(Workdir), outputfname), suppressWarnings(dirname))
 Outdir <- file.path(dirname(Workdir), outputfname)
 
+seasonname <- "Main"
+
 parent <- basename(Workdir)
 firstup <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
@@ -45,7 +47,7 @@ parentfolder <- dir(pattern = ".csv")
 
 parentfoldernames <- data.frame(zones = parentfolder)
 parentfoldernames$zones <- gsub("^.{4}", "", parentfoldernames$zones)
-parentfoldernames$zones <- gsub("Main.csv", "", parentfoldernames$zones)
+parentfoldernames$zones <- gsub(paste0(seasonname,".csv"), "", parentfoldernames$zones)
 
 
 
