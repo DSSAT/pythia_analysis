@@ -334,7 +334,7 @@ plot(zone1)
 
 ### applying special queery here 
 gha_pp_sfzones <- st_intersection(gha_pp_sf, st_set_crs(st_as_sf(as(zone1, "SpatialPolygons")), st_crs(gha_pp_sf)))
-if(!nrow(gha_pp_sfzones==0)){
+if(!nrow(gha_pp_sfzones)==0){
 gha_pp_sfzones <- gha_pp_sfzones %>%
   mutate( LONGITUDE= unlist(map(gha_pp_sfzones$geometry,1)),
           LATITUDE = unlist(map(gha_pp_sfzones$geometry,2)))
