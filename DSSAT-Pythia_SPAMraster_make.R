@@ -18,7 +18,7 @@ if (Sys.getenv("RSTUDIO") == "1") {
 source(file.path("util", "util.R"))
 
 
-Workdir <-adjPath("../data/spam2010V1r1_global_harv_area.csv")
+Workdir <-adjPath("../data/spam2010v1r1_global_harv_area.csv")
 setwd(Workdir)
 
 ### check the crop full name in list below;
