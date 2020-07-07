@@ -49,14 +49,25 @@ library(raster)
 library(gtools)
 library(tidyverse)
 
+#Set current work directory to the location of source
+if (Sys.getenv("RSTUDIO") == "1") {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+} else {
+  cmd.args <- commandArgs()
+  m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
+  setwd(dirname(regmatches(cmd.args, m)))
+}
+source(file.path("util", "util.R"))
 
-Workdir <-"D:\\Workdata\\Ghana\\Peanut\\Peanut_baserun_6_26_20\\GHA_GN_Main_base"
+# Workdir <-"D:\\Workdata\\Ghana\\Peanut\\Peanut_baserun_6_26_20\\GHA_GN_Main_base"
+Workdir <-adjPath("../data/GHA/spatialqueery/pythia_result_raw")
 setwd(Workdir)
 
 ## creating new output folder automatically in the one upper level of working directory 
-outputfname <- "GHA_GN_baserun_analysis"
-Outdir1 <- dir.create(file.path(dirname(Workdir), outputfname), suppressWarnings(dirname))
-Outdir <- file.path(dirname(Workdir), outputfname)
+outputfname <- "GHA_GN_baserun_analysis_countrylvl"
+Outdir <- file.path("..", outputfname)
+Outdir1 <- dir.create(Outdir, suppressWarnings(dirname))
+
 
 ## or you can create specific output folder below
 #Outdir <- "D:\\Workdata\\Ethiopia\\Sensitivity_Runs_NewPdatzones\\ETH_ALL_MZ\\Test2"
@@ -99,7 +110,7 @@ numpar <- length(parentfolder)
 resultssens <- c()
 for (j in 1:numpar){
 #Locations each parent folders
-kc <- paste0(Workdir, "\\", parentfolder[j])
+kc <- parentfolder[j]
 kc
 list.dirs(kc)
 main <- list.dirs(kc)[1]
@@ -124,11 +135,11 @@ resultsw <- c()
 for (k in 1:number3) {
   klm <- c()
   #matrix for reading csv colums
-  cd <-paste0(kc, '\\', mainfolder[k])
+  cd <-file.path(kc, mainfolder[k])
   cd
   filename <- dir(cd)
   filename
-  csvpath <- paste0(cd,'\\', filename)
+  csvpath <- file.path(cd, filename)
   print(csvpath)
   content <- read.csv(csvpath, header = T, sep = ',', row.names = NULL)
   if(grepl("row.names", colnames(content)[1])==TRUE){
@@ -226,7 +237,7 @@ for (k in 1:number3) {
      
    }
    ### getting the results for each management
-  resultfiles <- paste0(Outdir, "\\", content[1,"RUN_NAME"], ".csv")
+  resultfiles <- file.path(Outdir, paste0(content[1,"RUN_NAME"], ".csv"))
   write.csv(averagecell,resultfiles)
   result <- rbind(result, averagecell)
   print(nrow(result))
@@ -308,7 +319,7 @@ resultssens <- rbind(resultssens, deneme3)
 
 
 ###Giving mainfolder names to csv files #####
-resultsfiles2 <- paste0(Outdir, "\\", paste(unlist(strsplit(as.character(content[1,"RUN_NAME"]),"_", fixed=TRUE))[-2], collapse = "_"), ".csv")
+resultsfiles2 <- file.path(Outdir, paste0(paste(unlist(strsplit(as.character(content[1,"RUN_NAME"]),"_", fixed=TRUE))[-2], collapse = "_"), ".csv"))
 write.csv(deneme3, resultsfiles2)
 
 

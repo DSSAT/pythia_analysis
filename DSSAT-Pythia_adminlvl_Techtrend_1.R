@@ -48,20 +48,28 @@ library(ggplot2)
 library(rnaturalearth)
 library(gtools)
 library(GADMTools)
+library(tidyverse)
 
-
+#Set current work directory to the location of source
+if (Sys.getenv("RSTUDIO") == "1") {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+} else {
+  cmd.args <- commandArgs()
+  m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
+  setwd(dirname(regmatches(cmd.args, m)))
+}
+source(file.path("util", "util.R"))
 
 ### set working directory here
-Workdir <-"D:\\Workdata\\Ethiopia\\Sensitivity_Runs_NewPdatzones\\ETH_ALL_MZ\\ETH_MZ_base\\ETH_MZ_Belg_base"
+# Workdir <-"D:\\workData\\test_data2\\WM_R\\ETH\\data\\tech_trend\\Pythia_raw_data\\GHA_MZ_Main_base"
+# Workdir <- "D:\\SSD_USER\\Documents\\NetBeansProjects\\Develop\\WM_project\\data\\GHA\\tech_trend\\pythia_result_raw"
+Workdir <-adjPath("../data/ETH/tech_trend/Pythia_Raw_data/ETH_MZ_Belg_base")
 setwd(Workdir)
 ### give output folder name here
-outputfname <- "ETH_MZ_Belg_Base_Analysis_adminlvl1test"
-Outdir1 <- dir.create(file.path(dirname(Workdir), outputfname), suppressWarnings(dirname))
-Outdir <- file.path(dirname(Workdir), outputfname)
-
-
-
-
+#outputfname <- "GHA_MZ_Main_Base_Analysis_Abo_adminlvl2test"
+outputfname <- "ETH_MZ_Belg_Base_Analysis_adminlvl1_techtrend1_test"
+Outdir <- file.path("..", "..", outputfname)
+Outdir1 <- dir.create(Outdir, suppressWarnings(dirname))
 
 ### Change it on line 
 ###Choosing mainfolder Management types only rainfed or only irrigated
@@ -98,7 +106,7 @@ numpar <- length(parentfolder)
 resultssens <- c()
 for (j in 1:numpar){
     #Locations each cells
-    kc <- paste0(Workdir, "\\", parentfolder[j])
+    kc <- parentfolder[j]
     kc
     list.dirs(kc)
     main <- list.dirs(kc)[1]
@@ -110,7 +118,7 @@ for (j in 1:numpar){
     mainfolder
     ###Choosing mainfolder Management types only rainfed or only irrigated
     #### 1: irrigated 2: rainfed 0N  3: rainfed highN  4: rainfed lowN c(1,2,3,4)
-    mainfolder <- mainfolder[][c(1,2,3,4)]
+    # mainfolder <- mainfolder[][c(1,2,3,4)]
     mainfolder
     mainfoldername <- unlist(strsplit(mainfolder, "_", fixed = TRUE))[1] ###irrig name 
     #mainfolder <- mainfolder [sapply(mainfolder, function(x) length(list.files(x))>0)]
@@ -125,11 +133,11 @@ for (j in 1:numpar){
         for (k in 1:number3) {
           klm <- c()
           #matrix for reading csv colums
-          cd <-paste0(kc, '\\', mainfolder[k])
+          cd <-file.path(kc, mainfolder[k])
           cd
           filename <- dir(cd)
           filename
-          csvpath <- paste0(cd,'\\', filename)
+          csvpath <- file.path(cd, filename)
           print(csvpath)
           content <- read.csv(csvpath, header = T, sep = ',', row.names = NULL)
           if(grepl("row.names", colnames(content)[1])==TRUE){
@@ -279,14 +287,15 @@ deneme4["VNAM"] <- deneme4$CNAM-deneme4$GNAM
 resultssens <- rbind(resultssens, deneme4)
 
 ###Giving parent folder name to csv files #####
-resultsfiles2 <- paste0(Outdir, "\\", years[r],cntryname, ".csv")
+resultsfiles2 <- file.path(Outdir, paste0(years[r],cntryname, ".csv"))
 #write.csv(deneme4, resultsfiles2)
 
 assign(gsub(" ","", paste("name", years[r])), deneme4)
 }
 }
 
-
+### zone analysis #### 
+setwd(Outdir)
 zonesaggyears <- c()
 for (e in 1:length(years)){
   
@@ -309,15 +318,11 @@ gha_pp_sf<- gha_pp_sf %>%
   select(LATITUDE, LONGITUDE, everything())
 
 
-
-### zone analysis #### 
-setwd(Outdir)
-
 #ctry_shps = do.call("bind", lapply(c(0,1), 
  #                                  function(x) getData('GADM', country="gha", level=x)))
-ctry_shps <- getData("GADM", download = TRUE, country="GHA", level=adminlvl)
+ctry_shps <- getData("GADM", download = TRUE, country=cntryname, level=adminlvl)
 allstatenumber <- length(ctry_shps$GID_1)
-cntrycsvname <- paste0(Outdir, "\\", years[e],cntryname, parentname, ".csv")
+cntrycsvname <- paste0(years[e],cntryname, parentname, ".csv")
 write.csv(gha_pp_sf, file = cntrycsvname)
 #ctry_shps$NAME_1[1] <- "GHA"
 for(z in 1:allstatenumber){
@@ -349,7 +354,7 @@ gha_pp_sfzones <- st_set_geometry(gha_pp_sfzones,NULL)
 #zonesaggyears <- rbind(gha_pp_sfzones, zonesaggyears)
 #zonesaggyears <- aggregate(.,by= zonesaggyears$YEARS,sum,na.rm=TRUE)[-c(1)]
 #years <- as.numeric(years)
-zonecsvname <- paste0(Outdir, "\\", years[e], zonename, parentname, ".csv")
+zonecsvname <- paste0(years[e], zonename, parentname, ".csv")
 write.csv(gha_pp_sfzones, file = zonecsvname)
 }else{
   

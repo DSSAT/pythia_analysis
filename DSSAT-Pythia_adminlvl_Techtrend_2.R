@@ -27,14 +27,24 @@ library(GADMTools)
 ### as an input (Workdir) we need to choose output folder of DSSAT-Pythia_adminlvl_Techtrend_2.R routine
 
 rm(list=ls())
-Workdir <-"D:\\Workdata\\Ghana\\Maize_base_run_6_8_abo\\Maize_base_run_abo_fentot150\\GHA_MZ_Main_Base_Analysis_Abo_adminlvl1_test"
+#Set current work directory to the location of source
+if (Sys.getenv("RSTUDIO") == "1") {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+} else {
+  cmd.args <- commandArgs()
+  m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
+  setwd(dirname(regmatches(cmd.args, m)))
+}
+source(file.path("util", "util.R"))
+
+Workdir <-adjPath("../data/ETH/tech_trend/ETH_MZ_Belg_Base_Analysis_adminlvl1_techtrend1_test")
 setwd(Workdir)
 ### give output folder name here
-outputfname <- "GHA_MZ_Main_Base_Analysis_Abo_adminlvl_techtrend2_test"
-Outdir1 <- dir.create(file.path(dirname(Workdir), outputfname), suppressWarnings(dirname))
-Outdir <- file.path(dirname(Workdir), outputfname)
+outputfname <- "ETH_MZ_Belg_Base_Analysis_adminlvl1_techtrend2_test"
+Outdir <- file.path("..", outputfname)
+Outdir1 <- dir.create(Outdir, suppressWarnings(dirname))
 
-seasonname <- "Main"
+# seasonname <- "Belg"
 
 parent <- basename(Workdir)
 firstup <- function(x) {
@@ -42,6 +52,7 @@ firstup <- function(x) {
   x
 }
 parentname <- firstup(unlist(strsplit(parent, "_", fixed = TRUE))[3]) ### 3 season name
+seasonname <- firstup(unlist(strsplit(parent, "_", fixed = TRUE))[3]) ### 3 season name
 
 parentfolder <- dir(pattern = ".csv")
 
@@ -58,7 +69,7 @@ zonefiles <- grep(paste0("*",zonename[a]), parentfolder)
 zonefiles
 zonesall <- c()
 for (e in zonefiles){
-  csvpath <- paste0(Workdir,'\\', parentfolder[e])
+  csvpath <- parentfolder[e]
   ###appended 4 sensitivity runs fen_tot offset 0, 15, 30, 60
   content <- read.csv(csvpath, header = T, sep = ',', row.names = NULL)
   if(grepl("row.names", colnames(content)[1])==TRUE){
@@ -179,7 +190,7 @@ for (e in zonefiles){
   deneme4["VNAM"] <- deneme4$CNAM-deneme4$GNAM 
   
   
-  resultsfiles2 <- paste0(Outdir, "\\", dframes[allstates[o]], parentname, ".csv")
+  resultsfiles2 <- file.path(Outdir, paste0(dframes[allstates[o]], parentname, ".csv"))
   write.csv(deneme4, resultsfiles2)
   
   }else{

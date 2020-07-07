@@ -1,12 +1,24 @@
 #### Creating SPAM rasters
 ##### Nebi Yesilekin
 
+rm(list=ls())
+library(rgdal)
 library(raster)
 library(rasterVis)
 library(countrycode)
 
-rm(list=ls())
-Workdir <-"D:\\Workdata\\Ethiopia\\SPAM\\World_SPAM\\spam2010V1r0_global_harv_area.csv"
+#Set current work directory to the location of source
+if (Sys.getenv("RSTUDIO") == "1") {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+} else {
+  cmd.args <- commandArgs()
+  m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
+  setwd(dirname(regmatches(cmd.args, m)))
+}
+source(file.path("util", "util.R"))
+
+
+Workdir <-adjPath("../data/spam2010V1r0_global_harv_area.csv")
 setwd(Workdir)
 
 ### check the crop full name in list below;
@@ -31,7 +43,7 @@ latmin <- 4    ### Ghana example
 latmax <- 12  ## Ghana example
 
 ##
-filepath <- file.path("D:\\Workdata",countryname, "SPAM", fsep = "\\")
+filepath <- file.path("..", countryname, "SPAM")
 Outdir <- dir.create(filepath, recursive = T)
 ### to find ISO3 name for countries
 #country <- "GHA"  ###ISO3 name for country
@@ -43,13 +55,12 @@ SPAMcrpname <- data.frame("Full_name"=c("wheat","rice","maize","barley","pearl m
 
 crname <- SPAMcrpname[grep(cropname, SPAMcrpname[,"Full_name"]), "SPAMcrcode"] 
 
-
-list <- dir(Workdir, pattern = ".csv")
+list <- dir(pattern = ".csv")
 ### loop for obtaining harvested area values ###
 for (k in 1:length(list)){
   
   ##find csv path and read csv
-  cd <-paste0(Workdir, '\\', list[k])
+  cd <- list[k]
   cd
   content <- read.csv(cd, header = T, sep = ',', quote = "", row.names = NULL)
   if(grepl("row.names", colnames(content)[1])==TRUE){
@@ -74,8 +85,8 @@ for (k in 1:length(list)){
   us_fire <- rasterize(result[, c('x', 'y')], fr, result[, paste0(crname,"_",rectype)], fun='last')
   plot(us_fire)
   ##write raster with unique name for each managements ### 
-  rastername <- paste0(filepath,"\\", "spam2010V1r0_", 
-                       tolower(country), "_harvested-area_", paste0(crname,"_",rectype))
+  rastername <- file.path(filepath,
+                          paste("spam2010V1r0", tolower(country), "harvested-area", crname, rectype, sep="_"))
   writeRaster(us_fire, filename = rastername, format = "GTiff", options=c('XML=YES'), NAflag= -99)
   
 }

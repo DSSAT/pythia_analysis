@@ -3,12 +3,22 @@
 #source("D:\\Workdata\\R_code\\R_code_2\\sensitivity_GitHUB3\\DSSAT-Pythia_adminlvl_Techtrend_2.R")
 
 rm(list = ls())
-Workdir <-"D:\\Workdata\\Ethiopia\\Sensitivity_Runs_NewPdatzones\\ETH_ALL_MZ\\ETH_MZ_base\\ETH_MZ_Belg_Base_Analysis_adminlvl2test"
+#Set current work directory to the location of source
+if (Sys.getenv("RSTUDIO") == "1") {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+} else {
+  cmd.args <- commandArgs()
+  m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
+  setwd(dirname(regmatches(cmd.args, m)))
+}
+source(file.path("util", "util.R"))
+Workdir <-adjPath("../data/ETH/tech_trend/ETH_MZ_Belg_Base_Analysis_adminlvl1_techtrend2_test")
 setwd(Workdir)
 
-outputfname <- "ETH_MZ_Belg_Base_Analysis_adminlvl3test"
-Outdir1 <- dir.create(file.path(dirname(Workdir), outputfname), suppressWarnings(dirname))
-Outdir <- file.path(dirname(Workdir), outputfname)
+outputfname <- "ETH_MZ_Belg_Base_Analysis_adminlvl1_techtrend3_test"
+Outdir <- file.path("..", outputfname)
+Outdir1 <- dir.create(Outdir, suppressWarnings(dirname))
+
 
 
 ### choose year range for technology trend analysis 
