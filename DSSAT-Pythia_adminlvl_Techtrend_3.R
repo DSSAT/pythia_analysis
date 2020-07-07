@@ -1,4 +1,7 @@
 #### read observed values ### 
+rm(list=ls())
+library(plyr)
+library(stringr)
 
 #source("D:\\Workdata\\R_code\\R_code_2\\sensitivity_GitHUB3\\DSSAT-Pythia_adminlvl_Techtrend_2.R")
 
@@ -33,13 +36,12 @@ firstup <- function(x) {
   x
 }
 parentname <- firstup(unlist(strsplit(parent, "_", fixed = TRUE))[3]) ### 3 season name
-
 #unlist(strsplit(Workdir, "_", fixed = TRUE))[3]
 
-observedpath <- "D:\\Workdata\\Ethiopia\\Ixchel\\ETH_OBS_csv"
+observedpath <- "../ETH_Reports"
 files <- dir(observedpath, pattern = "_OBS.csv")
 files
-csvpatho <- paste0(observedpath,'\\', files[2])
+csvpatho <- file.path(observedpath, files[2])
 csvpatho  
 #csvpath <- "C:\\Users\\nebiyesilekin\\Desktop\\Hudo\\vakhtang\\allyearAfarMeher.csv"
 contento <- read.csv(csvpatho, header = T, sep = ',', row.names = NULL)
@@ -51,7 +53,7 @@ sfiles <- dir(pattern = "all*")
 #sfiles[grep("ETH", sfiles)] <- "allyearETH_CSAMeher.csv"
 
 for(i in 1:length(sfiles)){
-  csvpaths <- paste0(Workdir,"\\", sfiles[i])
+  csvpaths <- sfiles[i]
   contents <- read.csv(csvpaths)
   contentsy <- contents[grep(frstyear, contents[, "YEARS"]):grep(lastyear, contents[, "YEARS"]), "HWAM"]
   assign(gsub("allyear", "", paste0(sfiles[i])), contentsy)
@@ -98,7 +100,7 @@ for( e in 1:length(zonenames)){
                          )
   minyd <- round(min(combined, na.rm = TRUE)-1000, digits = -2)
   maxyd <- round(max(combined, na.rm = TRUE)+4000, digits = -2)
-  zonepngname <- paste0(Outdir, "\\", zonenames[e], ".png")  
+  zonepngname <- file.path(Outdir, paste0(zonenames[e], ".png"))
   png(zonepngname, width=600, height=350)
   par(xpd=FALSE)
   # xlim= c(min(contento[, "Maize"]),(min(contento[, "Maize"])+(nrow(devs)-1)))
@@ -112,7 +114,7 @@ for( e in 1:length(zonenames)){
   lines(contents[grep(frstyear, contents[, "YEARS"]):grep(lastyear, contents[, "YEARS"]), "YEARS"],unlist(lapply(ls()[grep(paste0(zonenames[e],parentname, ".csv"), ls())], function(w) get(w))), col= "red", type = "l" , lty = 6, lwd = 4)  ### Simulated 
   lines(yearsl,allpredlast[], col= "blue", type = "l" , lty = 6, lwd = 4) ### Linear Equation Simulated 
   #abline(lm(contento[,paste0(zonenames[1],"_Yield")] ~ contento[,"Maize"]))
-  #zonepngname <- paste0(Outdir, "\\", zonenames[1], ".png")
+  #zonepngname <- file.path(Outdir, paste0(zonenames[1], ".png"))
   grid(nx = NULL, ny =  NULL, col = "lightgray", lty = "dotted")
   
   legend("topright",c("Observed", "Trendline", "Simulated", "Corrected Simulated"), 
