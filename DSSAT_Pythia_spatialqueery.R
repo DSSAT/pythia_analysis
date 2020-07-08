@@ -87,10 +87,11 @@ nyears <- lstyear - frstyear + 1
 range <- as.character(seq(frstyear, lstyear,1))
 
 #### defining a polygon to clip out 
-poly <- adjPath(configObj$spatialqueery$shape_file_path)
-poly2 <- st_read(poly)
-
-poly3 <- as_Spatial(poly2)
+if (is.null(configObj$spatialqueery$shape_file_path)) {
+  poly <- adjPath(configObj$spatialqueery$shape_file_path)
+  poly2 <- st_read(poly)
+  poly3 <- as_Spatial(poly2)
+}
 
 
 #### long season special calculation for HDAT average for meher season in Ethiopia ###
@@ -169,20 +170,20 @@ for (k in 1:number3) {
   
   ### spatial querry #####
   ### this part helps us to clip area of interest
-  content <- st_as_sf(content, coords =c("LONGITUDE", "LATITUDE"), crs = 4326)
-  content <- st_intersection(content, st_set_crs(st_as_sf(as(poly3, "SpatialPolygons")), st_crs(content)))
-
-  
-  
-  content <- content %>%
-    mutate( LONGITUDE= unlist(map(content$geometry,1)),
-            LATITUDE = unlist(map(content$geometry,2)))
-
-  content<- content%>%
-  select(LATITUDE, LONGITUDE, everything())
-  
-  
-  content <- st_set_geometry(content,NULL)
+  if (is.null(configObj$spatialqueery$shape_file_path)) {
+    content <- st_as_sf(content, coords =c("LONGITUDE", "LATITUDE"), crs = 4326)
+    content <- st_intersection(content, st_set_crs(st_as_sf(as(poly3, "SpatialPolygons")), st_crs(content)))
+    
+    content <- content %>%
+      mutate( LONGITUDE= unlist(map(content$geometry,1)),
+              LATITUDE = unlist(map(content$geometry,2)))
+    
+    content<- content%>%
+      select(LATITUDE, LONGITUDE, everything())
+    
+    
+    content <- st_set_geometry(content,NULL)
+  }
 
 #####excluding rows with unwanted years for analysis ####
 #### examples for excluding year of 2019 
