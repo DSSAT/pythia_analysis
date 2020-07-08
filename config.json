@@ -1,0 +1,13 @@
+{
+  "spatialqueery": {
+    "work_dir" : "../data/ETH/spatialqueery/ETH_MZ_fen_tot_test3",
+    "output_folder_name" : "Pythia_results_local",
+    "output_base_dir" : "..",
+    "country_name" : "Ethiopia",
+    "first_year" : 1984,
+    "last_year" : 2017,
+    "shape_file_path" : "../ETH_Kelem_shp/Kelem_Wellega_Oramia.shp",
+    "season" : "meher",
+    "earliest_planting_date" : 135
+  }
+}

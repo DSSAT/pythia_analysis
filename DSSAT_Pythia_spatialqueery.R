@@ -37,6 +37,18 @@
 
 rm(list=ls())
 #rm(list=setdiff(ls(), c("Workdir", "Outdir"))) #remove everthing except workdir and outdir
+
+#Set current work directory to the location of source
+if (Sys.getenv("RSTUDIO") == "1") {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+} else {
+  cmd.args <- commandArgs()
+  m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
+  setwd(dirname(regmatches(cmd.args, m)))
+}
+source(file.path("util", "util.R"))
+config <- parseCmd()
+
 library(plotly)
 library(gapminder)
 library(stringr)
@@ -50,49 +62,40 @@ library(raster)
 library(gtools)
 library(tidyverse)
 
-#Set current work directory to the location of source
-if (Sys.getenv("RSTUDIO") == "1") {
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-} else {
-  cmd.args <- commandArgs()
-  m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
-  setwd(dirname(regmatches(cmd.args, m)))
-}
-source(file.path("util", "util.R"))
-
-Workdir <- adjPath("../data/ETH/spatialqueery/ETH_MZ_fen_tot_test3")
+Workdir <- adjPath(config$spatialqueery$work_dir)
 setwd(Workdir)
 
 ## creating new output folder automatically in the one upper level of working directory 
 # outputfname <- "ETH_fen_tot_test_Kelem3"
-outputfname <- "Pythia_results_local"
-Outdir <- file.path("..", outputfname)
+outputfname <- config$spatialqueery$output_folder_name
+Outdir <- file.path(config$spatialqueery$output_base_dir, outputfname)
 Outdir1 <- dir.create(Outdir, suppressWarnings(dirname))
 
 ####getting aggregated average for each sell
 
 
 ###ISO3 country name 
-cntry <- as.character("Ethiopia")
+cntry <- as.character(config$spatialqueery$country_name)
 
 ## inputs ### 
-nyears <- 34 #####number of years in seasonal analysis
+# nyears <- 34 #####number of years in seasonal analysis
 
 ## filtering years, choosing year range 
-frstyear <- 1984
-lstyear <- 2017
+frstyear <- config$spatialqueery$first_year
+lstyear <- config$spatialqueery$last_year
+nyears <- lstyear - frstyear + 1
 range <- as.character(seq(frstyear, lstyear,1))
 
 #### defining a polygon to clip out 
-poly <- adjPath("..\\ETH_Kelem_shp\\Kelem_Wellega_Oramia.shp")
+poly <- adjPath(config$spatialqueery$shape_file_path)
 poly2 <- st_read(poly)
 
 poly3 <- as_Spatial(poly2)
 
 
 #### long season special calculation for HDAT average for meher season in Ethiopia ###
-lseason <- "meher"
-lseasonth <- 135 ### earliest planting date in meher season. 
+lseason <- config$spatialqueery$season
+lseasonth <- config$spatialqueery$earliest_planting_date ### earliest planting date in meher season. 
 
 ###Choosing mainfolder Management types only rainfed or only irrigated
 #### 1: irrigated 2: rainfed 0N  3: rainfed highN  4: rainfed lowN c(1,2,3,4)
