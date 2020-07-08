@@ -36,6 +36,18 @@
 
 rm(list=ls())
 #rm(list=setdiff(ls(), c("Workdir", "Outdir"))) #remove everthing except workdir and outdir
+
+#Set current work directory to the location of source
+if (Sys.getenv("RSTUDIO") == "1") {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+} else {
+  cmd.args <- commandArgs()
+  m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
+  setwd(dirname(regmatches(cmd.args, m)))
+}
+source(file.path("util", "util.R"))
+configObj <- parseCmd()
+
 library(plotly)
 library(gapminder)
 library(stringr)
@@ -49,47 +61,34 @@ library(raster)
 library(gtools)
 library(tidyverse)
 
-#Set current work directory to the location of source
-if (Sys.getenv("RSTUDIO") == "1") {
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-} else {
-  cmd.args <- commandArgs()
-  m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
-  setwd(dirname(regmatches(cmd.args, m)))
-}
-source(file.path("util", "util.R"))
-
-# Workdir <-"D:\\Workdata\\Ghana\\Peanut\\Peanut_baserun_6_26_20\\GHA_GN_Main_base"
-Workdir <-adjPath("../data/GHA/spatialqueery/pythia_result_raw")
+Workdir <- adjPath(configObj$countrylvl$work_dir)
 setwd(Workdir)
 
 ## creating new output folder automatically in the one upper level of working directory 
-outputfname <- "GHA_GN_baserun_analysis_countrylvl"
-Outdir <- file.path("..", outputfname)
+outputfname <- configObj$countrylvl$output_folder_name
+Outdir <- file.path(configObj$countrylvl$output_base_dir, outputfname)
 Outdir1 <- dir.create(Outdir, suppressWarnings(dirname))
 
-
-## or you can create specific output folder below
-#Outdir <- "D:\\Workdata\\Ethiopia\\Sensitivity_Runs_NewPdatzones\\ETH_ALL_MZ\\Test2"
 ####getting aggregated average for each sell
 
 
 ###ISO3 country name 
-cntry <- as.character("Ghana")
+cntry <- as.character(configObj$countrylvl$country_name)
 
 ## inputs ### 
-nyears <- 36 #####number of years in seasonal analysis
+#nyears <- 36 #####number of years in seasonal analysis
 
 ## filtering years, choosing year range 
-frstyear <- 1984
-lstyear <- 2019
+frstyear <- configObj$countrylvl$first_year
+lstyear <- configObj$countrylvl$last_year
+nyears <- lstyear - frstyear + 1
 range <- as.character(seq(frstyear, lstyear,1))
 
 
 
 #### long season special calculation for HDAT average for meher season in Ethiopia ###
-lseason <- "meher"
-lseasonth <- 135 ### earliest planting date in meher season. 
+lseason <- configObj$countrylvl$season
+lseasonth <- configObj$countrylvl$earliest_planting_date ### earliest planting date in meher season. 
 
 ###Choosing mainfolder Management types only rainfed or only irrigated
 #### irrigated rainfed 0N   rainfed highN   rainfed lowN c(1,2,3,4) ## be careful with order of array
@@ -122,7 +121,7 @@ mainfolder<-dir(kc)
 mainfolder
 ###Choosing mainfolder Management types only rainfed or only irrigated
 #### 1: irrigated 2: rainfed 0N  3: rainfed highN  4: rainfed lowN c(1,2,3,4) example for Ethiopia
-mainfolder <- mainfolder[][c(1,2,3)]
+#mainfolder <- mainfolder[][c(1,2,3)]
 mainfoldername <- unlist(strsplit(mainfolder, "_", fixed = TRUE))[1] ###Crop name 
 #mainfolder <- mainfolder [sapply(mainfolder, function(x) length(list.files(x))>0)]
 #mainfolder
