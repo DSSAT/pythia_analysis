@@ -47,7 +47,7 @@ if (Sys.getenv("RSTUDIO") == "1") {
   setwd(dirname(regmatches(cmd.args, m)))
 }
 source(file.path("util", "util.R"))
-config <- parseCmd()
+configObj <- parseCmd()
 
 library(plotly)
 library(gapminder)
@@ -62,40 +62,40 @@ library(raster)
 library(gtools)
 library(tidyverse)
 
-Workdir <- adjPath(config$spatialqueery$work_dir)
+Workdir <- adjPath(configObj$spatialqueery$work_dir)
 setwd(Workdir)
 
 ## creating new output folder automatically in the one upper level of working directory 
 # outputfname <- "ETH_fen_tot_test_Kelem3"
-outputfname <- config$spatialqueery$output_folder_name
-Outdir <- file.path(config$spatialqueery$output_base_dir, outputfname)
+outputfname <- configObj$spatialqueery$output_folder_name
+Outdir <- file.path(configObj$spatialqueery$output_base_dir, outputfname)
 Outdir1 <- dir.create(Outdir, suppressWarnings(dirname))
 
 ####getting aggregated average for each sell
 
 
 ###ISO3 country name 
-cntry <- as.character(config$spatialqueery$country_name)
+cntry <- as.character(configObj$spatialqueery$country_name)
 
 ## inputs ### 
 # nyears <- 34 #####number of years in seasonal analysis
 
 ## filtering years, choosing year range 
-frstyear <- config$spatialqueery$first_year
-lstyear <- config$spatialqueery$last_year
+frstyear <- configObj$spatialqueery$first_year
+lstyear <- configObj$spatialqueery$last_year
 nyears <- lstyear - frstyear + 1
 range <- as.character(seq(frstyear, lstyear,1))
 
 #### defining a polygon to clip out 
-poly <- adjPath(config$spatialqueery$shape_file_path)
+poly <- adjPath(configObj$spatialqueery$shape_file_path)
 poly2 <- st_read(poly)
 
 poly3 <- as_Spatial(poly2)
 
 
 #### long season special calculation for HDAT average for meher season in Ethiopia ###
-lseason <- config$spatialqueery$season
-lseasonth <- config$spatialqueery$earliest_planting_date ### earliest planting date in meher season. 
+lseason <- configObj$spatialqueery$season
+lseasonth <- configObj$spatialqueery$earliest_planting_date ### earliest planting date in meher season. 
 
 ###Choosing mainfolder Management types only rainfed or only irrigated
 #### 1: irrigated 2: rainfed 0N  3: rainfed highN  4: rainfed lowN c(1,2,3,4)
@@ -128,7 +128,7 @@ mainfolder<-dir(kc)
 mainfolder
 ###Choosing mainfolder Management types only rainfed or only irrigated
 #### 1: irrigated 2: rainfed 0N  3: rainfed highN  4: rainfed lowN c(1,2,3,4)
-mainfolder <- mainfolder[][c(1,2,3,4)]
+#mainfolder <- mainfolder[][c(1,2,3,4)]
 mainfoldername <- unlist(strsplit(mainfolder, "_", fixed = TRUE))[1] ###Crop name 
 #mainfolder <- mainfolder [sapply(mainfolder, function(x) length(list.files(x))>0)]
 #mainfolder
@@ -206,7 +206,9 @@ for (k in 1:number3) {
   cname <- unlist(strsplit(as.character(content[1,"RUN_NAME"]),"_", fixed=TRUE))[4]
   sensappname <- unlist(strsplit(as.character(content[1,"RUN_NAME"]),"_", fixed=TRUE))[5]
   offsetn <- unlist(strsplit(as.character(content[1,"RUN_NAME"]),"_", fixed=TRUE))[6]
-  
+  if(is.na(offsetn)){
+    rm(offsetn)
+  }
   ### for meher season hdat 
   if(grepl(lseason, sname)){
      for ( c in 1:nrow(content)){
