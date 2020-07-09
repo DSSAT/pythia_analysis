@@ -47,7 +47,7 @@ if (Sys.getenv("RSTUDIO") == "1") {
   setwd(dirname(regmatches(cmd.args, m)))
 }
 source(file.path("util", "util.R"))
-configObj <- parseCmd()
+configObj <- parseCmd("spatialqueery")
 
 library(plotly)
 library(gapminder)
@@ -62,41 +62,41 @@ library(raster)
 library(gtools)
 library(tidyverse)
 
-Workdir <- adjPath(configObj$spatialqueery$work_dir)
+Workdir <- adjPath(configObj$work_dir)
 setwd(Workdir)
 
 ## creating new output folder automatically in the one upper level of working directory 
 # outputfname <- "ETH_fen_tot_test_Kelem3"
-outputfname <- configObj$spatialqueery$output_folder_name
-Outdir <- file.path(configObj$spatialqueery$output_base_dir, outputfname)
+outputfname <- configObj$output_folder_name
+Outdir <- file.path(configObj$output_base_dir, outputfname)
 Outdir1 <- dir.create(Outdir, suppressWarnings(dirname))
 
 ####getting aggregated average for each sell
 
 
 ###ISO3 country name 
-cntry <- as.character(configObj$spatialqueery$country_name)
+cntry <- as.character(configObj$country_name)
 
 ## inputs ### 
 # nyears <- 34 #####number of years in seasonal analysis
 
 ## filtering years, choosing year range 
-frstyear <- configObj$spatialqueery$first_year
-lstyear <- configObj$spatialqueery$last_year
+frstyear <- configObj$first_year
+lstyear <- configObj$last_year
 nyears <- lstyear - frstyear + 1
 range <- as.character(seq(frstyear, lstyear,1))
 
 #### defining a polygon to clip out 
-if (is.null(configObj$spatialqueery$shape_file_path)) {
-  poly <- adjPath(configObj$spatialqueery$shape_file_path)
+if (is.null(configObj$shape_file_path)) {
+  poly <- adjPath(configObj$shape_file_path)
   poly2 <- st_read(poly)
   poly3 <- as_Spatial(poly2)
 }
 
 
 #### long season special calculation for HDAT average for meher season in Ethiopia ###
-lseason <- configObj$spatialqueery$season
-lseasonth <- configObj$spatialqueery$earliest_planting_date ### earliest planting date in meher season. 
+lseason <- configObj$season
+lseasonth <- configObj$earliest_planting_date ### earliest planting date in meher season. 
 
 ###Choosing mainfolder Management types only rainfed or only irrigated
 #### 1: irrigated 2: rainfed 0N  3: rainfed highN  4: rainfed lowN c(1,2,3,4)
@@ -170,7 +170,7 @@ for (k in 1:number3) {
   
   ### spatial querry #####
   ### this part helps us to clip area of interest
-  if (is.null(configObj$spatialqueery$shape_file_path)) {
+  if (is.null(configObj$shape_file_path)) {
     content <- st_as_sf(content, coords =c("LONGITUDE", "LATITUDE"), crs = 4326)
     content <- st_intersection(content, st_set_crs(st_as_sf(as(poly3, "SpatialPolygons")), st_crs(content)))
     
