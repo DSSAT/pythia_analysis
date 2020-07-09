@@ -10,5 +10,16 @@
     "season" : "meher",
     "earliest_planting_date" : 135
     
+  },
+  "SPAMraster" : {
+    "SPAM_url" : "",
+    "SPAM_local_dir" : "../data/spam2010v1r1_global_harv_area.csv",
+    "output_base_dir" : "..",
+    "country_name" : "Ghana",
+    "crop" : "groundnut",
+    "longitude_min" : -4.5,
+    "longitude_max" : 2,
+    "latitude_min" : 4,
+    "latitude_max" : 12
   }
 }

@@ -2,10 +2,6 @@
 ##### Nebi Yesilekin
 
 rm(list=ls())
-library(rgdal)
-library(raster)
-library(rasterVis)
-library(countrycode)
 
 #Set current work directory to the location of source
 if (Sys.getenv("RSTUDIO") == "1") {
@@ -16,10 +12,30 @@ if (Sys.getenv("RSTUDIO") == "1") {
   setwd(dirname(regmatches(cmd.args, m)))
 }
 source(file.path("util", "util.R"))
+configObj <- parseCmd("SPAMraster")
 
+library(rgdal)
+library(raster)
+library(rasterVis)
+library(countrycode)
 
-Workdir <-adjPath("../data/spam2010v1r1_global_harv_area.csv")
-setwd(Workdir)
+Workdir <- adjPath(configObj$SPAM_local_dir)
+if (dir.exists(Workdir)) {
+  setwd(Workdir)
+} else {
+  dir.create(path=Workdir, recursive = T)
+  setwd(Workdir)
+  # download the SPAM data with given URL
+  SPAMUrl = configObj$SPAM_url
+  if (is.null(SPAMUrl) || SPAMUrl == ""){
+    # using the default SPAM URL to download data
+    SPAMUrl = "https://s3.amazonaws.com/mapspam/2010/v1.1/csv/spam2010v1r1_global_harv_area.csv.zip"
+  }
+  download.file(url=SPAMUrl, destfile="tmp.zip")
+  unzip(zipfile="tmp.zip",
+        files=grep(unzip(zipfile="tmp.zip", list=TRUE)$Name, pattern="\\.csv$", value=TRUE, ignore.case = TRUE))
+  file.remove("tmp.zip")
+}
 
 ### check the crop full name in list below;
 ####"Full_name"=c("wheat","rice","maize","barley","pearl millet","small millet","sorghum","other cereals",
@@ -30,21 +46,23 @@ setwd(Workdir)
 ####"vegetables","rest of crops")
 
 ###define Country and Crop name below #####
-countryname <- "Ghana"
-cropname <- "groundnut"
+countryname <- configObj$country_name
+cropname <- configObj$crop
 
 ### Define extension of country in degree 
 ### add or substract 0.5 degree from each side
 ### minimum and maximum longitude extension of country
-longmin <- -4.5  ## Ghana example
-longmax <-  2     ## Ghana example
+longmin <- configObj$longitude_min  ## Ghana example
+longmax <- configObj$longitude_max     ## Ghana example
 #### minimum and maximim latitude extension of country 
-latmin <- 4    ### Ghana example
-latmax <- 12  ## Ghana example
+latmin <- configObj$latitude_min    ### Ghana example
+latmax <- configObj$latitude_max  ## Ghana example
 
 ##
-filepath <- file.path("..", countryname, "SPAM")
-Outdir <- dir.create(filepath, recursive = T)
+filepath <- file.path(configObj$output_base_dir, countryname, "SPAM")
+if (!dir.exists(filepath)) {
+  Outdir <- dir.create(filepath, recursive = T)
+}
 ### to find ISO3 name for countries
 #country <- "GHA"  ###ISO3 name for country
 country <- countrycode(countryname, origin ='country.name', destination ='iso3c')
@@ -62,6 +80,8 @@ for (k in 1:length(list)){
   ##find csv path and read csv
   cd <- list[k]
   cd
+  prefix <- str_split(cd, pattern = "_", simplify=TRUE)[1]
+  print(paste0("processing ", cd))
   content <- read.csv(cd, header = T, sep = ',', quote = "", row.names = NULL)
   if(grepl("row.names", colnames(content)[1])==TRUE){
     colnames(content) <-c(colnames(content)[-1], NULL)
@@ -86,8 +106,8 @@ for (k in 1:length(list)){
   plot(us_fire)
   ##write raster with unique name for each managements ### 
   rastername <- file.path(filepath,
-                          paste("spam2010V1r0", tolower(country), "harvested-area", crname, rectype, sep="_"))
-  writeRaster(us_fire, filename = rastername, format = "GTiff", options=c('XML=YES'), NAflag= -99)
+                          paste(prefix, tolower(country), "harvested-area", crname, rectype, sep="_"))
+  writeRaster(us_fire, filename = rastername, format = "GTiff", options=c('XML=YES'), NAflag= -99, overwrite=TRUE)
   
 }
 
