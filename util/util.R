@@ -5,11 +5,11 @@ adjPath <- function(pathStr){
   return (str_replace_all(pathStr, "[\\\\/]", .Platform$file.sep))
 }
 
-parseCmd <- function(scriptName=NULL) {
+parseCmd <- function(sourceDir=getwd(), scriptName=NULL) {
   args <- commandArgs(trailingOnly = TRUE)
   # load default setting
-  configFile <- "config.json"
-  pythiaConfigFile <- "pythia_config.json"
+  configFile <- file.path(sourceDir, "config.json")
+  pythiaConfigFile <- file.path(sourceDir, "pythia_config.json")
   if (length(args) > 1) {
     # read config JSON file
     pythiaConfigFile <- args[1]

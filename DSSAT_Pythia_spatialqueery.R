@@ -18,15 +18,18 @@ rm(list=ls())
 #Set current work directory to the location of source to load utility file
 Workdir <- getwd()
 if (Sys.getenv("RSTUDIO") == "1") {
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+  sourceDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
 } else {
   cmd.args <- commandArgs()
   m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
-  setwd(dirname(regmatches(cmd.args, m)))
+  sourceDir <- dirname(regmatches(cmd.args, m))
 }
+setwd(sourceDir)
 source(file.path("util", "util.R"))
-setwd(Workdir)
-configObj <- parseCmd("spatialqueery")
+if (Sys.getenv("RSTUDIO") != "1") {
+  setwd(Workdir)
+}
+configObj <- parseCmd(sourceDir, "spatialqueery")
 
 library(plotly)
 library(gapminder)
@@ -85,7 +88,12 @@ for (i in 1 : length(configObj$pythia_config$plugins)) {
       for (m in 1 : length(values)) {
         for (n in 1 : orgSize) {
           idx = (m - 1) * orgSize + n
-          factors[[idx]] <- c(factors[[idx]], paste0("_", values[[m]]))
+          if (typeof(values) != "character") {
+            factorStr <- paste0("_", varName, "_", values[[m]])
+          } else {
+            factorStr <- paste0("_", values[[m]])
+          }
+          factors[[idx]] <- c(factors[[idx]], factorStr)
         }
       }
     }
@@ -325,7 +333,7 @@ for (i in 1:length(factors)) {
   resultssens <- rbind(resultssens, deneme3)
   
   ### Giving mainfolder names to csv files #####
-  resultsfiles2 <- file.path(Outdir, paste0(paste(unlist(strsplit(as.character(content[1,"RUN_NAME"]),"_", fixed=TRUE))[-2], collapse = "_"), ".csv"))
+  resultsfiles2 <- file.path(Outdir, paste0("aggregate_result", paste0(factors[[i]], collapse = ""), ".csv"))
   write.csv(deneme3, resultsfiles2)
 
 }
