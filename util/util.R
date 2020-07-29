@@ -7,18 +7,43 @@ adjPath <- function(pathStr){
 
 parseCmd <- function(scriptName=NULL) {
   args <- commandArgs(trailingOnly = TRUE)
-  if (length(args) == 0) {
-    # load default setting
-    configFile <- "config.json"
-  } else {
+  # load default setting
+  configFile <- "config.json"
+  pythiaConfigFile <- "pythia_config.json"
+  if (length(args) > 1) {
     # read config JSON file
-    configFile <- args[1]
+    pythiaConfigFile <- args[1]
+    if (length(args) > 2) {
+      configFile <- args[2]
+    }
   }
+  
   if (!file.exists(configFile)) stop (paste0("Cannot find file [", configFile, "]"))
+  if (!file.exists(pythiaConfigFile)) stop (paste0("Cannot find file [", pythiaConfigFile, "]"))
   configObj <- fromJSON(file = configFile)
+  pythiaConfigObj <- fromJSON(file = pythiaConfigFile)
   if (is.null(scriptName)) {
+    configObj$pythia_config = pythiaConfigObj
     return (configObj)
   } else {
-    return (get(scriptName, configObj))
+    configObj[[scriptName]]$pythia_config = pythiaConfigObj
+    return (configObj[[scriptName]])
   }
+}
+
+getSAFactors <- function(configObj) {
+  for (i in 1 : length(configObj$plugins)) {
+    if (configObj$plugins[[i]]$plugin == "sensitivity_plugin") {
+      for (j in 1 : length(configObj$plugins[[i]]$params)) {
+        
+      }
+    }
+  }
+
+}
+
+
+firstup <- function(x) {
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  x
 }
