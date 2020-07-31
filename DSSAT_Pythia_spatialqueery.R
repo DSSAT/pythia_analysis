@@ -1,15 +1,15 @@
-##### Sensitivity analysis Graphs with Slider #####
-#### Nebi Yesilekin #####
+### Sensitivity analysis Graphs with Slider ###
+### Nebi Yesilekin ###
+### Meng Zhang
 
-#### this script help us to create csv files for each management and 
-#####       a weighted average for all managements 
+### this script help us to create csv files for each management and 
+### a weighted average for all managements 
 ### Example output files 
-##### Maize_irrig_belg_S_season_fen_tot_50.csv for irrigated management       
-####  Maize_rf-0N_belg_S_season_fen_tot_50.csv    for rainfed low input management
-####  Maize_rf-highN_belg_S_season_fen_tot_50.csv    for rainfed high input management
-####  Maize_rf-lowN_belg_S_season_fen_tot_50.csv   for rainfed low input management
-####  Maize_belg_S_season_fen_tot_50.csv for weighted average between all managements
-
+### Maize_irrig_belg_S_season_fen_tot_50.csv for irrigated management       
+###  Maize_rf-0N_belg_S_season_fen_tot_50.csv    for rainfed low input management
+###  Maize_rf-highN_belg_S_season_fen_tot_50.csv    for rainfed high input management
+###  Maize_rf-lowN_belg_S_season_fen_tot_50.csv   for rainfed low input management
+###  Maize_belg_S_season_fen_tot_50.csv for weighted average between all managements
 
 
 rm(list=ls())
@@ -74,32 +74,7 @@ if (is.null(configObj$shape_file_path)) {
 }
 
 ### setup the factor groups
-factors <- list({})
-# factors <- data.frame()
-for (i in 1 : length(configObj$pythia_config$plugins)) {
-  if (configObj$pythia_config$plugins[[i]]$plugin == "sensitivity_plugin") {
-    varNames <- names(configObj$pythia_config$plugins[[i]]$params)
-    for (j in 1 : length(varNames)) {
-      varName <- varNames[[j]]
-      values <- configObj$pythia_config$plugins[[i]]$params[[varName]]$values
-      # factors[[varName]] <- c()
-      orgSize <- length(factors)
-      factors <- rep(factors, length(values))
-      for (m in 1 : length(values)) {
-        for (n in 1 : orgSize) {
-          idx = (m - 1) * orgSize + n
-          if (typeof(values) != "character") {
-            factorStr <- paste0("_", varName, "_", values[[m]])
-          } else {
-            factorStr <- paste0("_", values[[m]])
-          }
-          factors[[idx]] <- c(factors[[idx]], factorStr)
-        }
-      }
-    }
-  }
-}
-
+factors <- getSAFactors(configObj)
 
 #### long season special calculation for HDAT average for meher season in Ethiopia ###
 # lseason <- configObj$season
