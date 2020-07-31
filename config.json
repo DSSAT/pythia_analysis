@@ -4,6 +4,7 @@
     "output_folder_name" : "Pythia_results_local",
     "output_base_dir" : "..",
     "shape_file_path" : "../ETH_Kelem_shp/Kelem_Wellega_Oramia.shp",
+    "output_file_prefix" : "aggregate_result",
     "first_year" : 1984,
     "last_year" : 2017,
     "skip_years" : [2019],
