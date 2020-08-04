@@ -61,11 +61,12 @@ latmax <- configObj$latitude_max  ## Ghana example
 
 ##
 filepath <- file.path(configObj$output_base_dir, countryname, "SPAM")
-if (!dir.exists(filepath)) {
-  Outdir <- dir.create(filepath, recursive = T)
+if (dir.exists(filepath)) {
+  unlink(Outdir, recursive=TRUE)
 }
+Outdir <- dir.create(filepath, recursive = T, suppressWarnings(dirname))
 ### to find ISO3 name for countries
-#country <- "GHA"  ###ISO3 name for country
+### ISO3 name for country, for example, "GHA"
 country <- countrycode(countryname, origin ='country.name', destination ='iso3c')
 
 ### Crop name in SPAM data source

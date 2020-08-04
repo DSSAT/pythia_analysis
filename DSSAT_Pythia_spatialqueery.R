@@ -49,13 +49,12 @@ Workdir <- adjPath(configObj$work_dir)
 setwd(Workdir)
 
 ### creating new output folder automatically in the one upper level of working directory 
-# outputfname <- "ETH_fen_tot_test_Kelem3"
 outputfname <- configObj$output_folder_name
 Outdir <- file.path(configObj$output_base_dir, outputfname)
 if (file.exists(Outdir)) {
   unlink(Outdir, recursive=TRUE)
 }
-Outdir1 <- dir.create(Outdir, suppressWarnings(dirname))
+Outdir1 <- dir.create(Outdir, recursive = T, suppressWarnings(dirname))
 outputPrefix <- configObj$output_file_prefix
 
 #### getting aggregated average for each sell
