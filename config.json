@@ -16,7 +16,8 @@
 		"excludes" : {
 		  "season" : "belg"
 		}
-	}
+	},
+	"factor_key_val_divider" : "_"
   },
   "techtrend": {
     "work_dir" : "../data/ETH/tech_trend/Pythia_Raw_data/ETH_MZ_Belg_base",
@@ -45,6 +46,7 @@
 	    "season" : "belg"
 	  }
 	},
+	"factor_key_val_divider" : "",
 	"pythia_config" : {
 	  "plugins" : [
 	    {

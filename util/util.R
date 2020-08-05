@@ -52,6 +52,10 @@ parseCmd <- function(sourceDir=getwd(), scriptName=NULL) {
 ### read config and create factor groups for aggregation
 getSAFactors <- function(configObj) {
   factors <- list({})
+  divider <- configObj$factor_key_val_divider
+  if (is.null(divider)) {
+    divider <- ""
+  }
   # factors <- data.frame()
   for (i in 1 : length(configObj$pythia_config$plugins)) {
     if (configObj$pythia_config$plugins[[i]]$plugin == "sensitivity_plugin") {
@@ -66,7 +70,7 @@ getSAFactors <- function(configObj) {
           for (n in 1 : orgSize) {
             idx = (m - 1) * orgSize + n
             if (typeof(values) != "character") {
-              factorStr <- paste0("_", varName, "_", values[[m]])
+              factorStr <- paste0("_", varName, divider, values[[m]])
             } else {
               factorStr <- paste0("_", values[[m]])
             }
