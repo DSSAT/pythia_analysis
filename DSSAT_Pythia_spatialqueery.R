@@ -13,10 +13,8 @@
 
 
 rm(list=ls())
-#rm(list=setdiff(ls(), c("Workdir", "Outdir"))) #remove everthing except workdir and outdir
 
-#Set current work directory to the location of source to load utility file
-Workdir <- getwd()
+### get the location of source to load utility file
 if (Sys.getenv("RSTUDIO") == "1") {
   sourceDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
 } else {
@@ -24,11 +22,7 @@ if (Sys.getenv("RSTUDIO") == "1") {
   m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
   sourceDir <- dirname(regmatches(cmd.args, m))
 }
-setwd(sourceDir)
-source(file.path("util", "util.R"))
-if (Sys.getenv("RSTUDIO") != "1") {
-  setwd(Workdir)
-}
+source(file.path(sourceDir, "util", "util.R"))
 configObj <- parseCmd(sourceDir, "spatialqueery")
 
 library(plotly)
@@ -85,7 +79,6 @@ lseasonth <- configObj$earliest_planting_date ### earliest planting date in mehe
 
 parent <- basename(Workdir)
 parentfolder <- dir()
-numpar <- length(parentfolder)
 resultssens <- c()
 for (i in 1:length(factors)) {
   ### collect related sub result folders by grouped factors
@@ -317,3 +310,4 @@ for (i in 1:length(factors)) {
   write.csv(deneme3, resultsfiles2)
 
 }
+

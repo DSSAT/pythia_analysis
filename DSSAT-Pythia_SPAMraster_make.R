@@ -4,15 +4,15 @@
 
 rm(list=ls())
 
-### Set current work directory to the location of source
+### get the location of source to load utility file
 if (Sys.getenv("RSTUDIO") == "1") {
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+  sourceDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
 } else {
   cmd.args <- commandArgs()
   m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
-  setwd(dirname(regmatches(cmd.args, m)))
+  sourceDir <- dirname(regmatches(cmd.args, m))
 }
-source(file.path("util", "util.R"))
+source(file.path(sourceDir, "util", "util.R"))
 configObj <- parseCmd("SPAMraster")
 
 library(rgdal)

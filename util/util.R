@@ -4,6 +4,8 @@
 library(stringr)
 library(rjson)
 
+
+
 ### Adjust path to adopt multiple OS platform
 adjPath <- function(pathStr){
   return (str_replace_all(pathStr, "[\\\\/]", .Platform$file.sep))
@@ -35,10 +37,14 @@ parseCmd <- function(sourceDir=getwd(), scriptName=NULL) {
   }
   ### generate return object
   if (is.null(scriptName)) {
-    configObj$pythia_config = pythiaConfigObj
+    if (is.null(configObj$pythia_config)) {
+      configObj$pythia_config = pythiaConfigObj
+    }
     return (configObj)
   } else {
-    configObj[[scriptName]]$pythia_config = pythiaConfigObj
+    if (is.null(configObj[[scriptName]]$pythia_config)) {
+      configObj[[scriptName]]$pythia_config = pythiaConfigObj
+    }
     return (configObj[[scriptName]])
   }
 }
@@ -73,8 +79,25 @@ getSAFactors <- function(configObj) {
   return (factors)
 }
 
+getTechTrendResultDir <- function(configObj, scriptNum = 1) {
+  if (scriptNum == 1 && !is.null(configObj$output_folder_name_1)) {
+    return (file.path(configObj$output_base_dir, configObj$output_folder_name_1))
+  } else if (scriptNum == 2 && !is.null(configObj$output_folder_name_2)) {
+    return (file.path(configObj$output_base_dir, configObj$output_folder_name_2))
+  } else {
+    return (configObj$work_dir)
+  }
+}
+
 
 firstup <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
   x
 }
+
+split_path <- function(x) {
+  if (dirname(x)==x) x 
+  else c(basename(x),split_path(dirname(x)))
+}
+funList <- c()
+funList <- ls()
