@@ -1,71 +1,67 @@
+##### Sensitivity analysis with admin level 2 +  Graphs with Slider #####
+#### Nebi Yesilekin ####
+#### Meng Zhang ####
+
 #### read observed values ### 
-rm(list=ls())
+rm(list=setdiff(ls(), funList))
 library(plyr)
 library(stringr)
 
-#source("D:\\Workdata\\R_code\\R_code_2\\sensitivity_GitHUB3\\DSSAT-Pythia_adminlvl_Techtrend_2.R")
-
-rm(list = ls())
-#Set current work directory to the location of source
-if (Sys.getenv("RSTUDIO") == "1") {
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-} else {
-  cmd.args <- commandArgs()
-  m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
-  setwd(dirname(regmatches(cmd.args, m)))
-}
-source(file.path("util", "util.R"))
-Workdir <-adjPath("../data/ETH/tech_trend/ETH_MZ_Belg_Base_Analysis_adminlvl1_techtrend2_test")
+### set working directory here
+Workdir <- adjPath(configObj$work_dir)
 setwd(Workdir)
 
-outputfname <- "ETH_MZ_Belg_Base_Analysis_adminlvl1_techtrend3_test"
-Outdir <- file.path("..", outputfname)
+### give output folder name here
+outputfname <- configObj$output_folder_name_3
+Outdir <- file.path(configObj$output_base_dir, outputfname)
+if (file.exists(Outdir)) {
+  unlink(Outdir, recursive=TRUE)
+}
 Outdir1 <- dir.create(Outdir, suppressWarnings(dirname))
-
-
+outputPrefix <- configObj$output_file_prefix
+### Adjust work directory to the place where store the result from Techtrend 1 script
+Workdir2 <-adjPath(getTechTrendResultDir(configObj, 2))
 
 ### choose year range for technology trend analysis 
-frstyear <- 2012
-lastyear <- 2018
-range <- seq(frstyear, lastyear, 1)
+frstyear <- configObj$first_year_3
+lastyear <- configObj$last_year_3
+range <- as.character(seq(frstyear, lastyear, 1))
+skipYears <- configObj$skip_years
 
+### setup the factor groups
+# seasonname <- "Belg"
+factors <- getSAFactors(configObj)
 
-parent <- basename(Workdir)
-firstup <- function(x) {
-  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
-  x
-}
-parentname <- firstup(unlist(strsplit(parent, "_", fixed = TRUE))[3]) ### 3 season name
-#unlist(strsplit(Workdir, "_", fixed = TRUE))[3]
+parentname <- paste0(factors[[1]], collapse = "")
+# parent <- basename(Workdir)
+# parentname <- firstup(unlist(strsplit(parent, "_", fixed = TRUE))[3]) ### 3 season name
 
-observedpath <- "../ETH_Reports"
+observedpath <- configObj$observed_path
 files <- dir(observedpath, pattern = "_OBS.csv")
 files
 csvpatho <- file.path(observedpath, files[2])
 csvpatho  
-#csvpath <- "C:\\Users\\nebiyesilekin\\Desktop\\Hudo\\vakhtang\\allyearAfarMeher.csv"
 contento <- read.csv(csvpatho, header = T, sep = ',', row.names = NULL)
 #contento <- na.omit(contento)
 #contento[,] <- as.numeric(as.character(contento[,]))
 cropname <- as.character(names(contento[1])) 
 
-sfiles <- dir(pattern = "all*")
-#sfiles[grep("ETH", sfiles)] <- "allyearETH_CSAMeher.csv"
+sfiles <- dir(Workdir2, pattern = "all*")
 
 for(i in 1:length(sfiles)){
-  csvpaths <- sfiles[i]
+  csvpaths <- file.path(Workdir2, sfiles[i])
   contents <- read.csv(csvpaths)
   contentsy <- contents[grep(frstyear, contents[, "YEARS"]):grep(lastyear, contents[, "YEARS"]), "HWAM"]
-  assign(gsub("allyear", "", paste0(sfiles[i])), contentsy)
+  assign(gsub("allyear_", "", paste0(sfiles[i])), contentsy)
 }
-
  
-
-zonenames<- gsub("-", ".",gsub(paste0("allyear|",parentname,".csv"), "", sfiles))
+### obtain zone name list
+parentfolder <- dir(Workdir2, pattern = ".csv")
+zonenames <- str_split(parentfolder, pattern = "_", simplify = T)[,2]
+zonenames <- unique(zonenames)
 zonenames <- gsub(",", ".", zonenames)
+zonenames <- gsub("-", ".", zonenames)
 years <- range
-
-
 
 for( e in 1:length(zonenames)){
   allpred <- c()
@@ -79,9 +75,8 @@ for( e in 1:length(zonenames)){
   
   means <- mean(unlist(lapply(ls()[grep(zonenames[e], ls())], function(w) get(w))))
   devs <-  data.frame(unlist(lapply(ls()[grep(paste0(zonenames[e],parentname, ".csv"), ls())], function(w) get(w))))
-  #devs <- 
   devs[,] <- ((devs-means)/means)
-  #### + number of years added 
+  ### + number of years added 
   devs[(nrow(devs)+1):(nrow(devs)+1),] <- 0
   yearsl <- seq(min(contento[, cropname]), (min(contento[, cropname])+(nrow(devs)-1)), by=1)
   for (c in yearsl){
@@ -107,7 +102,7 @@ for( e in 1:length(zonenames)){
   plot(contento[,cropname], contento[, paste0(zonenames[e],"_Yield")], 
        pch = 19,ylim= c(minyd, maxyd), xlim= c(frstyear-1,lastyear+2),
        ylab = "Yield(kg/ha)", xlab= "Years",
-       main= paste0(zonenames[e]," Techtrend Application for ", parentname," ",cropname, " Yield")
+       main= paste0(zonenames[e]," Techtrend Application for ", substring(parentname, 2)," ",cropname, " Yield")
        ) ##Observed ### type = "b"
   #lines(contento[, "Maize"],fitted(fit2b), col= "red", type = "l" , lty = 6, lwd = 4)
   lines(contento[, cropname],fitted(fit1b), col= "pink", type = "l" , lty = 6, lwd = 4)  ### Trend line

@@ -18,6 +18,46 @@
 		}
 	}
   },
+  "techtrend": {
+    "work_dir" : "../data/ETH/tech_trend/Pythia_Raw_data/ETH_MZ_Belg_base",
+    "output_folder_name_1" : "ETH_MZ_Belg_Base_Analysis_adminlvl1_techtrend1_test",
+    "output_folder_name_2" : "ETH_MZ_Belg_Base_Analysis_adminlvl1_techtrend2_test",
+    "output_folder_name_3" : "ETH_MZ_Belg_Base_Analysis_adminlvl1_techtrend3_test",
+    "skip_runs" : [1],
+    "output_base_dir" : "../..",
+    "observed_path" : "../../ETH_Reports",
+    "output_file_prefix" : "aggregate_result",
+    "GADM" : {
+      "country_code" : "ETH",
+      "admin_level" : 1
+    },
+    "first_year" : 1985,
+    "last_year" : 2018,
+    "first_year_3" : 2012,
+    "last_year_3" : 2018,
+    "skip_years" : [2019],
+    "earliest_planting_date" : 135,
+	"factor_filters": {
+	  "includes" : {
+	    "crop" : "Maize"
+	  },
+	  "excludes" : {
+	    "season" : "belg"
+	  }
+	},
+	"pythia_config" : {
+	  "plugins" : [
+	    {
+	      "plugin": "sensitivity_plugin",
+          "params": {
+            "season": {
+              "values": ["belg"]
+            }
+          }
+	    }
+	  ]
+	}
+  },
   "SPAMraster" : {
     "SPAM_url" : "",
     "SPAM_local_dir" : "../data/spam2010v1r1_global_harv_area.csv",
