@@ -13,7 +13,7 @@
 
 
 rm(list=ls())
-
+orgWorkDir <- getwd()
 ### get the location of source to load utility file
 if (Sys.getenv("RSTUDIO") == "1") {
   sourceDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
@@ -311,3 +311,4 @@ for (i in 1:length(factors)) {
 
 }
 
+setwd(orgWorkDir)

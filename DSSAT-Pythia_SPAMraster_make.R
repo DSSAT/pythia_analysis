@@ -3,6 +3,7 @@
 ### Meng Zhang
 
 rm(list=ls())
+orgWorkDir <- getwd()
 
 ### get the location of source to load utility file
 if (Sys.getenv("RSTUDIO") == "1") {
@@ -113,5 +114,5 @@ for (k in 1:length(list)){
   
 }
 
-
+setwd(orgWorkDir)
               
