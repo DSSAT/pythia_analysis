@@ -99,7 +99,7 @@ for (i in 1:length(factors)) {
     #matrix for reading csv colums
     cd <-mainfolder[k]
     cd
-    filename <- dir(cd)
+    filename <- dir(cd, pattern = ".csv")
     filename
     csvpath <- file.path(cd, filename)
     print(csvpath)
