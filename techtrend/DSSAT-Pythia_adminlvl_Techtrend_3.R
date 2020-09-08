@@ -4,8 +4,12 @@
 
 #### read observed values ### 
 rm(list=setdiff(ls(), funList))
-library(plyr)
-library(stringr)
+setup_packages(
+  c(
+    "plyr",
+    "stringr"
+  )
+)
 
 ### set working directory here
 Workdir <- adjPath(configObj$work_dir)

@@ -25,19 +25,23 @@ if (Sys.getenv("RSTUDIO") == "1") {
 source(file.path(sourceDir, "util", "util.R"))
 configObj <- parseCmd(sourceDir, "spatialqueery")
 
-library(plotly)
-library(gapminder)
-library(stringr)
-library(sf)
-library(maps)
-library(data.table)
-library(rgdal)
-library(ggplot2)
-library(rnaturalearth)
-library(raster)
-library(gtools)
-library(tidyverse)
-library(rlang)
+setup_packages(
+  c(
+    "plotly",
+    "gapminder",
+    "stringr",
+    "sf",
+    "maps",
+    "data.table",
+    "rgdal",
+    "ggplot2",
+    "rnaturalearth",
+    "raster",
+    "gtools",
+    "tidyverse",
+    "rlang"
+  )
+)
 
 Workdir <- adjPath(configObj$work_dir)
 setwd(Workdir)

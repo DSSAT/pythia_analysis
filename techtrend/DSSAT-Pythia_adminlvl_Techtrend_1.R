@@ -11,19 +11,23 @@
 
 ### clean all data from global environment except config
 rm(list=setdiff(ls(), funList))
-library(plotly)
-library(gapminder)
-library(stringr)
-library(sf)
-library(raster)
-library(maps)
-library(data.table)
-library(rgdal)
-library(ggplot2)
-library(rnaturalearth)
-library(gtools)
-library(GADMTools)
-library(tidyverse)
+setup_packages(
+  c(
+    "plotly",
+    "gapminder",
+    "stringr",
+    "sf",
+    "maps",
+    "data.table",
+    "rgdal",
+    "ggplot2",
+    "rnaturalearth",
+    "raster",
+    "gtools",
+    "GADMTools",
+    "tidyverse"
+  )
+)
 
 ### set working directory here
 Workdir <- adjPath(configObj$work_dir)

@@ -23,6 +23,22 @@ library(ggplot2)
 library(rnaturalearth)
 library(gtools)
 library(GADMTools)
+setup_packages(
+  c(
+    "plotly",
+    "gapminder",
+    "stringr",
+    "sf",
+    "maps",
+    "data.table",
+    "rgdal",
+    "ggplot2",
+    "rnaturalearth",
+    "raster",
+    "gtools",
+    "GADMTools"
+  )
+)
 
 ### set working directory here
 Workdir <- adjPath(configObj$work_dir)

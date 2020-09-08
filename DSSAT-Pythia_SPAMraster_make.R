@@ -16,10 +16,14 @@ if (Sys.getenv("RSTUDIO") == "1") {
 source(file.path(sourceDir, "util", "util.R"))
 configObj <- parseCmd(sourceDir, "SPAMraster")
 
-library(rgdal)
-library(raster)
-library(rasterVis)
-library(countrycode)
+setup_packages(
+  c(
+    "rgdal",
+    "raster",
+    "rasterVis",
+    "countrycode"
+  )
+)
 
 Workdir <- adjPath(configObj$SPAM_local_dir)
 if (dir.exists(Workdir)) {

@@ -93,6 +93,16 @@ getTechTrendResultDir <- function(configObj, scriptNum = 1) {
   }
 }
 
+setup_packages <- function(libNames) {
+  libDiff <- setdiff(libNames, rownames(installed.packages()))
+  if (length(libDiff) > 0) {
+    install.packages(libDiff)
+  }
+  for (i in 1 : length(libNames)) {
+    library(libNames[i], character.only = TRUE)
+  }
+}
+
 
 firstup <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
