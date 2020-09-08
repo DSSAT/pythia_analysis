@@ -31,7 +31,7 @@ if (dir.exists(Workdir)) {
   SPAMUrl = configObj$SPAM_url
   if (is.null(SPAMUrl) || SPAMUrl == ""){
     ### using the default SPAM URL to download data
-    SPAMUrl = "https://s3.amazonaws.com/mapspam/2010/v1.1/csv/spam2010v1r1_global_harv_area.csv.zip"
+    SPAMUrl = "https://s3.amazonaws.com/mapspam/2010/v1.0/csv/spam2010V1r0_global_harv_area.csv.zip"
   }
   download.file(url=SPAMUrl, destfile="tmp.zip")
   unzip(zipfile="tmp.zip",
