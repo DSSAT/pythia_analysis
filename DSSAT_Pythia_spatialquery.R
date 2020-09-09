@@ -23,7 +23,7 @@ if (Sys.getenv("RSTUDIO") == "1") {
   sourceDir <- dirname(regmatches(cmd.args, m))
 }
 source(file.path(sourceDir, "util", "util.R"))
-configObj <- parseCmd(sourceDir, "spatialqueery")
+configObj <- parseCmd(sourceDir, "spatialquery")
 
 setup_packages(
   c(

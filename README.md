@@ -10,7 +10,7 @@ If path to config JSON file is not mandatory. If not provided, it will try to fi
   
 If path to Pythia config JSON file is not mandatory. If not provided, it will try to find pythia_config.json in the root directory of script instead.
 
-# DSSAT_Pythia_spatialqueery.R
+# DSSAT_Pythia_spatialquery.R
 this script help us to create csv files for each factor combination. The factors are defined in the config JSON file.
 
 The parameters of this script defined in the config JSON file are shown as below,
