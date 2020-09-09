@@ -36,13 +36,13 @@ This R script contains 3 sub-steps, and you can run all of them or only part of 
 
 For example,
 
-    1, if output_folder_name_1 is provided, then script 1 will be executed.
+1. If output_folder_name_1 is provided, then script 1 will be executed.
     
-    2, if both output_folder_name_1 and output_folder_name_2 are provided, then both script 2 and 3 will be executed.
+1. If both output_folder_name_1 and output_folder_name_2 are provided, then both script 2 and 3 will be executed.
     
-    3, if only output_folder_name_2 is provided, then it will on run script 2.
+1. If only output_folder_name_2 is provided, then it will on run script 2.
     
-    4, only run script 1 and 3 is not supported, to run 3, you have to run script 2 or provide existing result from previous runs of 2. Similar condition for 2 as well.
+1. Only run script 1 and 3 is not supported, to run 3, you have to run script 2 or provide existing result from previous runs of 2. Similar condition for 2 as well.
  
 The parameters of this script defined in the config JSON file are shown as below,
  
