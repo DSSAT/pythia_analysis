@@ -2,6 +2,8 @@
 Post-processing scripts for DSSAT-pythia outputs
 
 # Run the script in command line
+These series of R routines help us to analyze yearly and region level(admin level) results for a country.
+
 To run these scripts, simply use the following command
 
     Rscript [path to script] [path to config JSON file] [path to Pythia coinfig JSON file]
@@ -11,7 +13,9 @@ If path to config JSON file is not mandatory. If not provided, it will try to fi
 If path to Pythia config JSON file is not mandatory. If not provided, it will try to find pythia_config.json in the root directory of script instead.
 
 # DSSAT_Pythia_spatialquery.R
-this script help us to create csv files for each factor combination. The factors are defined in the config JSON file.
+This script is used to analyze data at area of interest. Routine will calculate averages between years and create csv files for each management just for area of interest which will be defined as polygon shapefile in script. Then, based on the averages between years, it will also calculate weighted average between managements to analyze at country level. Output files as same as country level analysis.  Additional y to country level routine, we need to define Country name (cntry) and polygon shape file (poly). Second part will read the polygon shape file and convert it to spatial polygon to use in clipping area of interest.
+
+This script help us to create csv files for each factor combination. The factors are defined in the config JSON file.
 
 The parameters of this script defined in the config JSON file are shown as below,
 
@@ -32,7 +36,15 @@ The parameters of this script defined in the config JSON file are shown as below
     earliest_planting_date : the day of year for determine if a date is belongs the season of current year or the last year.
     
 # DSSAT-Pythia_adminlvl_Techtrend.R
-This R script contains 3 sub-steps, and you can run all of them or only part of them based on given config JSON file. The trigger is the existence of each output path.
+This R script contains 3 sub-steps, 
+
+Techtrend 1 will create csv outputs for each year for each region and country level.
+
+Techtrend 2, will concatenate yearly results by group of regions which defined by admin level.
+
+Techtrend 3, will read observed (reported) yearly values from the csv files that we predefined based on the admin level and crop. Then it will analyze first degree fitting analysis (1-degree polynomial). After all the calculations, it will create graphs for each region that show observed values, trendline of observed values, simulated values and corrected simulated values(based on the trendline and deviation from mean). 
+    
+You can run all of them or only part of them based on given config JSON file. The trigger is the existence of each output path.
 
 For example,
 
